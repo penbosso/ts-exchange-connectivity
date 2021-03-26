@@ -42,6 +42,8 @@ public class OrderService {
                 ObjectMapper mapper=new JsonMapper();
 
                 ExchangeOrder exchangeOrder = mapper.readValue(data, ExchangeOrder.class);
+
+                //MAke the actual order on behalf of the client
                 HttpEntity<ActualOrder> request = new HttpEntity<>(
                         new ActualOrder(
                                 exchangeOrder.order.product,
@@ -52,25 +54,26 @@ public class OrderService {
                 String orderKey="";
                 String url= String.format("%s/%s/order",exchangeOrder.exchange,privateKey);
                 System.out.println(url);
-//                ResponseEntity<String> response = restTemplate
-//                       .exchange(exchangeOrder.exchange + privateKey , HttpMethod.POST, request,String.class);
-//                if(response.getStatusCodeValue() == 200){
-//                    orderKey=response.getBody();
-//                    orderKey=orderKey.substring(1,orderKey.length()-1);
-//                }
+                ResponseEntity<String> response = restTemplate
+                       .exchange(exchangeOrder.exchange + privateKey , HttpMethod.POST, request,String.class);
+                if(response.getStatusCodeValue() == 200){
+                    orderKey=response.getBody();
+                    assert orderKey != null;
+                    orderKey=orderKey.substring(1,orderKey.length()-1);
+                }
 
-
-//                HttpEntity<ExchangeActivity> requestLog = new HttpEntity<>(
-//                        new ExchangeActivity(exchangeOrder.order.id,
-//                                exchangeOrder.order.side,
-//                                exchangeOrder.order.side,
-//                                exchangeOrder.order.quantity,
-//                                exchangeOrder.order.price,
-//                                orderKey
-//                        ));
-//                ResponseEntity<String> responseLog = restTemplate
-//                        .exchange("http://localhost:3005/exchange-activity-report", HttpMethod.POST, request, String.class);
-//                response.getStatusCodeValue();
+            //Log the data to the reporting service
+                HttpEntity<ExchangeActivity> requestLog = new HttpEntity<>(
+                        new ExchangeActivity(exchangeOrder.order.id,
+                                exchangeOrder.order.side,
+                                exchangeOrder.order.side,
+                                exchangeOrder.order.quantity,
+                                exchangeOrder.order.price,
+                                orderKey
+                        ));
+                ResponseEntity<String> responseLog = restTemplate
+                        .exchange("http://localhost:3005/exchange-activity-report", HttpMethod.POST, request, String.class);
+                response.getStatusCodeValue();
             }catch (JsonProcessingException e){
                 System.out.println("exception" + e.getMessage());
 
