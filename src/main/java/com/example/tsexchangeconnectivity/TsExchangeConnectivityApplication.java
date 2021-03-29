@@ -6,11 +6,19 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 
 @SpringBootApplication
 public class TsExchangeConnectivityApplication implements ApplicationRunner {
+
+	@Bean
+	public RestTemplate getRestTemplate() {
+		return new RestTemplate();
+	}
+
 	@Autowired
 	ProcessTradeQueueService processTradeQueueService;
 
@@ -23,7 +31,7 @@ public class TsExchangeConnectivityApplication implements ApplicationRunner {
 
 			System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 			System.out.println("^^Processing TradeOrder Service subscription");
-			processTradeQueueService.tradeOrderQueue();
+//			processTradeQueueService.tradeOrderQueue();
 			System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 
 	}

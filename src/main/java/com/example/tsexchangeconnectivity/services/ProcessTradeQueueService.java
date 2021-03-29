@@ -2,6 +2,7 @@ package com.example.tsexchangeconnectivity.services;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
@@ -17,13 +18,14 @@ public class ProcessTradeQueueService {
     private String PASSWORD;
 
     public void tradeOrderQueue() {
-        JedisPool jedisPool = new JedisPool(new JedisPoolConfig(), HOST, PORT, 10000, PASSWORD);
+        Jedis jedis = new Jedis( HOST, PORT,0);
+        jedis.auth(PASSWORD);
         while (true) {
-            List<String> orderQueue = jedisPool.getResource().blpop(10000, "exchange-trade");
+            List<String> orderQueue = jedis.blpop( 0,"exchange-trade");
 
             if (orderQueue == null) continue;
 
-            System.out.println("Received -> " + orderQueue);
+//            System.out.println("Received -> " + orderQueue);
 
             //exchange trade
 
